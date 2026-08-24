@@ -1,0 +1,10 @@
+# Lokal gelistirme icin kisayol: `docker compose up --build`
+# Render/Railway gibi servisler bu dosyayi kullanmaz, dogrudan Dockerfile'i
+# okur -- bu dosya sadece kendi bilgisayarinda hizli test icin.
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    restart: unless-stopped

@@ -1,0 +1,17 @@
+# Uretim (Docker / deploy) icin minimal bagimliliklar.
+# Notebook, gorsellestirme ve SHAP gibi sadece gelistirme/analiz asamasinda
+# gereken paketler (bkz. requirements.txt) burada YOK -- imaji kucuk ve
+# derlemeyi hizli tutmak icin sadece Flask sitesinin calismasi icin
+# gereken paketler listelendi.
+
+flask
+gunicorn
+
+pandas
+numpy
+# Modelin kaydedildigi surumle (bkz. models/model_pipeline.pkl) birebir ayni
+# sabitlendi -- farkli bir scikit-learn surumu, pickle'in ic yapisi (orn.
+# ColumnTransformer._RemainderColsList) degistigi icin modeli acamayabilir.
+scikit-learn==1.6.1
+lightgbm
+joblib

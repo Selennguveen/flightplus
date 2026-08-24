@@ -1,0 +1,32 @@
+# Veri işleme
+pandas
+numpy
+
+# Görselleştirme
+matplotlib
+seaborn
+plotly
+kaleido
+
+# Modelleme
+# Surum sabitlendi: models/model_pipeline.pkl bu surumle kaydedildi,
+# farkli bir scikit-learn surumu pickle'i acamayabilir (bkz. Dockerfile notu).
+scikit-learn==1.6.1
+xgboost
+lightgbm
+
+# Model açıklanabilirlik
+shap
+
+# Model kaydetme/yükleme
+joblib
+
+# Uygulama (web sitesi)
+flask
+
+# Notebook (VS Code için)
+jupyter
+ipykernel
+
+# Test
+pytest

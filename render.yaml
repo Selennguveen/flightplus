@@ -1,0 +1,11 @@
+# Render.com "Blueprint" tanimi -- bu dosya repoda oldugu surece,
+# Render'da "New +" -> "Blueprint" ile bu repoyu secip tek tikla
+# deploy edebilirsin (hesap/GitHub baglantisi hala senin yapman gerekiyor).
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: flightplus
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free

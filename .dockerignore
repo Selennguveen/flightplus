@@ -1,0 +1,29 @@
+# Imaja dahil edilmemesi gereken her sey -- imaji kucuk ve build'i hizli
+# tutmak icin (Docker context'e bile gonderilmezler).
+
+.git
+.gitignore
+.venv
+venv
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+
+# Notebook / EDA / veri (imaj sadece kaydedilmis modeli kullanir)
+notebooks/
+data/
+figures/
+
+# Testler (imaj icinde calistirilmiyor; CI/lokal gelistirmede kullanilir)
+tests/
+
+# Gelistirme-oncesi dokumanlar, gecici dosyalar
+_to_delete/
+*.docx
+README.md
+
+# Agent/skill config dosyalari (proje calismasi icin gerekmiyor)
+.agents/
+.claude/
+skills-lock.json

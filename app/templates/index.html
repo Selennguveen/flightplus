@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlightPlus • Havayolu Yolcu Memnuniyeti Tahmini</title>
+  <meta name="description" content="Yolcu profili ve uçuş deneyimi bilgilerinizi girin, gelişmiş makine öğrenmesi modelimiz memnuniyet seviyesini tahmin etsin.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="dark-theme">
+
+  <!-- Ana Kapsayıcı -->
+  <div class="app-container">
+
+    <!-- Üst Navigasyon Çubuğu -->
+    <header class="app-navbar">
+      <div class="nav-brand" id="brand-link" style="cursor: pointer;">
+        <span class="nav-brand-icon">✈️</span>
+        <span class="nav-brand-name">FlightPlus</span>
+      </div>
+
+      <nav class="nav-links">
+        <a href="#tahmin" class="nav-link active" id="nav-tab-predict">Tahmin</a>
+        <a href="#analizler" class="nav-link" id="nav-tab-analytics">Analizler</a>
+        <a href="#model" class="nav-link" id="nav-tab-model">Model</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button type="button" class="btn-theme-toggle">
+          <span class="theme-icon">☀️</span>
+          <span>Tema</span>
+        </button>
+        <button type="button" class="btn-dashboard" id="btn-nav-dashboard">Dashboard</button>
+      </div>
+    </header>
+
+    <!-- ============================================================
+         GÖRÜNÜM 1: TAHMİN EKRANI (Ana Sayfa)
+         ============================================================ -->
+    <main class="page-view active" id="view-predict">
+      
+      <!-- Hero Bölümü & Uçak Camı -->
+      <section class="hero-section" id="tahmin">
+        <div class="hero-grid">
+          
+          <!-- Sol Alan: Başlık, Metrikler ve Model Rozetleri -->
+          <div class="hero-left">
+            <div class="ai-badge">
+              <span class="ai-badge-dot"></span>
+              <span>AI DESTEKLİ CANLI TAHMİN</span>
+            </div>
+
+            <h1 class="hero-title">
+              Havayolu Yolcu Memnuniyeti <span class="gradient-text">Tahmini</span>
+            </h1>
+
+            <p class="hero-description">
+              Yolcu profili ve uçuş deneyimi bilgilerinizi girin, gelişmiş makine öğrenmesi
+              modelimiz memnuniyet seviyesini tahmin etsin.
+            </p>
+
+            <!-- Orijinal 3 Metrik Kartı -->
+            <div class="hero-metrics">
+              <div class="metric-card">
+                <div class="metric-icon">🎯</div>
+                <div class="metric-info">
+                  <span class="metric-label">Test Accuracy</span>
+                  <span class="metric-value">%96,53</span>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon">📈</div>
+                <div class="metric-info">
+                  <span class="metric-label">F1-Score</span>
+                  <span class="metric-value">%95,97</span>
+                </div>
+              </div>
+
+              <div class="metric-card">
+                <div class="metric-icon">📊</div>
+                <div class="metric-info">
+                  <span class="metric-label">ROC-AUC</span>
+                  <span class="metric-value">%99,55</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Model Rozetleri -->
+            <div class="model-row">
+              <span class="model-label">Model</span>
+              <div class="model-badges">
+                <span class="model-badge badge-lgbm"><span class="badge-dot dot-green"></span>LightGBM</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sağ Alan: Uçak Penceresi (Video Oynatıcı) -->
+          <div class="hero-right">
+            <div class="airplane-window-frame">
+              <div class="window-inner">
+                <video class="window-video" autoplay muted loop playsinline preload="auto">
+                  <source src="{{ url_for('static', filename='videos/airplane-window.mp4') }}" type="video/mp4">
+                </video>
+                <div class="window-glass-reflection"></div>
+              </div>
+              <div class="window-shutter-rim"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="scroll-hint">
+          <span>🖱️ Aşağı kaydırın ∨</span>
+        </div>
+      </section>
+
+      <!-- Ana Form & Özet Bölümü -->
+      <section class="form-section">
+        <form method="POST" id="satisfaction-form" class="cards-layout">
+          
+          <!-- Sol Kart / Form Alanı -->
+          <div class="content-card card-form">
+            
+            <!-- 1. Yolcu Bilgisi -->
+            <div class="form-section-block">
+              <div class="card-title-row">
+                <div class="card-icon-wrap">👤</div>
+                <h2 class="card-title">Yolcu Bilgisi</h2>
+              </div>
+
+              <div class="form-grid-3">
+                <div class="form-field">
+                  <label>Cinsiyet</label>
+                  <select name="Gender" id="sel-gender">
+                    <option value="Female">Kadın</option>
+                    <option value="Male">Erkek</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label>Müşteri Tipi</label>
+                  <select name="Customer Type" id="sel-cust">
+                    <option value="Loyal Customer">Sadık müşteri</option>
+                    <option value="disloyal Customer">Sadık olmayan müşteri</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label>Seyahat Tipi</label>
+                  <select name="Type of Travel" id="sel-travel">
+                    <option value="Business travel">İş seyahati</option>
+                    <option value="Personal Travel">Kişisel seyahat</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-field">
+                  <label>Sınıf</label>
+                  <select name="Class" id="sel-class">
+                    <option value="Eco">Eco</option>
+                    <option value="Eco Plus">Eco Plus</option>
+                    <option value="Business">Business</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label>Yaş</label>
+                  <input type="number" name="Age" id="inp-age" min="7" max="100" value="35" required>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Uçuş Bilgisi -->
+            <div class="form-section-block">
+              <div class="card-title-row">
+                <div class="card-icon-wrap">🛫</div>
+                <h2 class="card-title">Uçuş Bilgisi</h2>
+              </div>
+
+              <div class="form-grid-3">
+                <div class="form-field">
+                  <label>Uçuş Mesafesi (mil)</label>
+                  <input type="number" name="Flight Distance" id="inp-dist" min="0" max="6000" value="1200" required>
+                </div>
+
+                <div class="form-field">
+                  <label>Kalkış Gecikmesi (dk)</label>
+                  <input type="number" name="Departure Delay in Minutes" id="inp-dep-delay" min="0" value="0" required>
+                </div>
+
+                <div class="form-field">
+                  <label>Varış Gecikmesi (dk)</label>
+                  <input type="number" name="Arrival Delay in Minutes" id="inp-arr-delay" min="0" value="0">
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Hizmet Puanları -->
+            <div class="form-section-block">
+              <div class="card-title-row">
+                <div class="card-icon-wrap">⭐</div>
+                <h2 class="card-title">Hizmet Puanları</h2>
+              </div>
+              <p class="form-section-hint">Her biri için 0 (çok kötü) — 5 (mükemmel) arası bir puan seçin.</p>
+
+              <div class="services-grid">
+                {% for field_name, field_label in hizmet_alanlari %}
+                <div class="service-row">
+                  <div class="service-name-score">
+                    <span>{{ field_label }}</span>
+                    <span class="score-num" id="val_{{ field_name | replace(' ', '_') }}">3</span>
+                  </div>
+                  <input type="range" name="{{ field_name }}" id="{{ field_name | replace(' ', '_') }}" min="0" max="5" step="1" value="3" class="clean-range">
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Tahmin Butonu -->
+            <button type="submit" class="btn-predict" id="btn-predict">
+              <span class="btn-icon" id="btn-predict-icon">✈️</span>
+              <span id="btn-predict-text">Memnuniyet Tahmini Yap</span>
+            </button>
+          </div>
+
+          <!-- Sağ Kart: Seçilen Metriklerin Canlı Özeti -->
+          <div class="content-card card-summary">
+            <div class="card-title-row">
+              <div class="card-icon-wrap" style="color: #60A5FA;">📊</div>
+              <h2 class="card-title">Özet</h2>
+            </div>
+
+            <div class="summary-list">
+              <div class="summary-item">
+                <span class="summary-label">Sınıf</span>
+                <span class="summary-val" id="sum-class">Eco</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Seyahat Tipi</span>
+                <span class="summary-val" id="sum-travel">İş seyahati</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Cinsiyet & Yaş</span>
+                <span class="summary-val" id="sum-passenger">Kadın, 35 Yaş</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Müşteri Sadakati</span>
+                <span class="summary-val" id="sum-loyalty">Sadık müşteri</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Uçuş Mesafesi</span>
+                <span class="summary-val" id="sum-dist">1.200 mil</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Toplam Gecikme</span>
+                <span class="summary-val" id="sum-delay">0 dakika</span>
+              </div>
+
+              <div class="summary-item">
+                <span class="summary-label">Ortalama Hizmet Puanı</span>
+                <span class="summary-val" id="sum-avg-service">3.0 / 5.0</span>
+              </div>
+            </div>
+
+            <div class="summary-tip-box">
+              <span>💡 Butona tıkladığınızda model analizi pop-up pencerede detaylarıyla görüntülenecektir.</span>
+            </div>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- Alt 3'lü Özellik Kartları -->
+      <footer class="app-footer">
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <div class="feature-text">
+            <h3>Güvenilir Tahmin</h3>
+            <p>%96,53 test doğruluğu ile sağlam model performansı</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-text">
+            <h3>Hızlı & Canlı</h3>
+            <p>Gerçek zamanlı tahmin ile anında sonuç alın</p>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-text">
+            <h3>Veri Gizliliği</h3>
+            <p>Verileriniz güvende, gizliliğiniz önceliğimizdir</p>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+
+    <!-- ============================================================
+         GÖRÜNÜM 2: ANALİZLER & TAHMİN GEÇMİŞİ EKRANI
+         ============================================================ -->
+    <section class="page-view" id="view-analytics">
+      <div class="analytics-header-row">
+        <div>
+          <h2 class="analytics-page-title">Tahmin ve Analiz Geçmişi</h2>
+          <p class="analytics-page-subtitle">Gerçekleştirdiğiniz tüm yolcu memnuniyeti simülasyonları ve model kararları</p>
+        </div>
+        <div class="analytics-actions">
+          <button type="button" class="btn-clear-history" id="btn-clear-history">🗑️ Geçmişi Temizle</button>
+          <button type="button" class="btn-new-prediction" id="btn-back-to-predict">➕ Yeni Tahmin Yap</button>
+        </div>
+      </div>
+
+      <!-- Analiz İstatistik Kartları -->
+      <div class="analytics-stats-grid">
+        <div class="stat-card">
+          <span class="stat-card-lbl">Toplam Yapılan Analiz</span>
+          <span class="stat-card-val" id="stat-total-count">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-lbl">Memnun Yolcu Oranı</span>
+          <span class="stat-card-val stat-satisfied" id="stat-satisfied-pct">%0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-lbl">Memnun Olmayan Oranı</span>
+          <span class="stat-card-val stat-dissatisfied" id="stat-dissatisfied-pct">%0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-lbl">Ortalama Güven Skoru</span>
+          <span class="stat-card-val stat-avg" id="stat-avg-prob">%0</span>
+        </div>
+      </div>
+
+      <!-- Geçmiş Tablosu -->
+      <div class="history-table-card">
+        <div class="table-responsive">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Zaman</th>
+                <th>Yolcu Profili</th>
+                <th>Kabin Sınıfı</th>
+                <th>Seyahat Türü</th>
+                <th>Gecikme</th>
+                <th>Hizmet Ort.</th>
+                <th>Tahmin Kararı</th>
+                <th>Model Güveni</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body">
+              <tr class="empty-row">
+                <td colspan="8">Henüz kayıtlı bir tahmin analizi bulunmuyor. Bir tahmin yaparak başlayın.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         GÖRÜNÜM 3: MODEL BİLGİSİ
+         ============================================================ -->
+    <section class="page-view" id="view-model">
+      <div class="analytics-header-row">
+        <div>
+          <h2 class="analytics-page-title">Model Bilgisi</h2>
+          <p class="analytics-page-subtitle">Tahmin motorunu güçlendiren LightGBM pipeline'ının teknik detayları</p>
+        </div>
+        <button type="button" class="btn-new-prediction" id="btn-model-back">← Tahmine Dön</button>
+      </div>
+
+      <!-- Metrik Kartları -->
+      <div class="analytics-stats-grid" style="margin-bottom: 24px;">
+        <div class="stat-card">
+          <span class="stat-card-lbl">Test Accuracy</span>
+          <span class="stat-card-val" style="color: #60A5FA;">%96,53</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-lbl">F1-Score</span>
+          <span class="stat-card-val" style="color: #A78BFA;">%95,97</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-lbl">ROC-AUC</span>
+          <span class="stat-card-val" style="color: #34D399;">%99,55</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-lbl">Precision</span>
+          <span class="stat-card-val" style="color: #F59E0B;">%97,93</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-lbl">Recall</span>
+          <span class="stat-card-val" style="color: #F87171;">%94,08</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-lbl">Optimal Eşik</span>
+          <span class="stat-card-val" style="color: #38BDF8;">0.5529</span>
+        </div>
+      </div>
+
+      <!-- Model Detay Kartları -->
+      <div class="model-info-grid">
+
+        <div class="model-info-card">
+          <div class="model-info-card-header">
+            <span class="model-info-icon">🤖</span>
+            <h3>Algoritma</h3>
+          </div>
+          <div class="model-info-rows">
+            <div class="model-info-row"><span>Algoritma</span><span class="model-info-val">LightGBM (Gradient Boosting)</span></div>
+            <div class="model-info-row"><span>Görev Türü</span><span class="model-info-val">Binary Classification</span></div>
+            <div class="model-info-row"><span>Karar Mekanizması</span><span class="model-info-val">Olasılık eşiği: 0.5529</span></div>
+            <div class="model-info-row"><span>Çıktı</span><span class="model-info-val">satisfied / neutral or dissatisfied</span></div>
+          </div>
+        </div>
+
+        <div class="model-info-card">
+          <div class="model-info-card-header">
+            <span class="model-info-icon">📦</span>
+            <h3>Veri Seti</h3>
+          </div>
+          <div class="model-info-rows">
+            <div class="model-info-row"><span>Eğitim Seti</span><span class="model-info-val">~103.904 kayıt</span></div>
+            <div class="model-info-row"><span>Test Seti</span><span class="model-info-val">25.976 kayıt</span></div>
+            <div class="model-info-row"><span>Özellik Sayısı</span><span class="model-info-val">22 ham → mühendislik sonrası artırılmış</span></div>
+            <div class="model-info-row"><span>Hedef Denge</span><span class="model-info-val">~%43 satisfied / %57 neutral-dissatisfied</span></div>
+          </div>
+        </div>
+
+        <div class="model-info-card">
+          <div class="model-info-card-header">
+            <span class="model-info-icon">⚙️</span>
+            <h3>Pipeline Adımları</h3>
+          </div>
+          <div class="model-info-rows">
+            <div class="model-info-row"><span>1. Adım</span><span class="model-info-val">OzellikMuhendisligi (Feature Engineering)</span></div>
+            <div class="model-info-row"><span>2. Adım</span><span class="model-info-val">ColumnTransformer (Encode + Scale)</span></div>
+            <div class="model-info-row"><span>3. Adım</span><span class="model-info-val">LGBMClassifier (predict_proba)</span></div>
+            <div class="model-info-row"><span>Threshold</span><span class="model-info-val">0.5529 (F1 maksimize)</span></div>
+          </div>
+        </div>
+
+        <div class="model-info-card">
+          <div class="model-info-card-header">
+            <span class="model-info-icon">⭐</span>
+            <h3>En Etkili Özellikler</h3>
+          </div>
+          <!-- Notebook'ta gercekten hesaplanan SHAP sonucuyla birebir ayni
+               (bkz. notebooks/airline.ipynb, "Model Aciklanabilirligi (SHAP)"
+               bolumu, ortalama mutlak SHAP degeri sirasi) -->
+          <div class="model-info-rows">
+            <div class="model-info-row"><span>1.</span><span class="model-info-val">Type of Travel</span></div>
+            <div class="model-info-row"><span>2.</span><span class="model-info-val">Inflight wifi service</span></div>
+            <div class="model-info-row"><span>3.</span><span class="model-info-val">Online boarding</span></div>
+            <div class="model-info-row"><span>4.</span><span class="model-info-val">Customer Type</span></div>
+            <div class="model-info-row"><span>5.</span><span class="model-info-val">Class</span></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         GENEL FOOTER — tüm sekmelerde (Tahmin/Analizler/Model) sabit
+         ============================================================ -->
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <div class="footer-top">
+          <div class="footer-brand">
+            <span class="footer-brand-icon">✈️</span>
+            <span class="footer-brand-name">FlightPlus</span>
+          </div>
+        </div>
+
+        <p class="footer-desc">
+          Kaggle "Airline Passenger Satisfaction" veri seti üzerine kurulmuş, uçtan uca bir makine
+          öğrenmesi portföy projesidir. Eğitim amaçlıdır; gerçek yolcu verisi işlemez ve gerçek bir
+          havayolu sistemine bağlı değildir.
+        </p>
+
+        <div class="footer-bottom">
+          <span>© 2026 Selen Güven</span>
+          <span class="footer-dot">•</span>
+          <span>LightGBM tabanlı memnuniyet tahmin modeli</span>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ============================================================
+       POP-UP MODAL (Tahmin Sonuç Ekranı + Sağa Uçan Uçak Arka Planı)
+       ============================================================ -->
+  <div class="modal-backdrop" id="prediction-modal" aria-hidden="true">
+    <div class="modal-card">
+      <button type="button" class="modal-close-btn" id="modal-close-x" aria-label="Kapat">&times;</button>
+      
+      <!-- Pop-up Arka Planı: 3D .GLB Uçak Sahnesi (Three.js) -->
+      <div class="modal-airplane-scene" id="modal-airplane-3d" aria-hidden="true"></div>
+
+      <!-- Pop-up İçerik -->
+      <div class="modal-inner">
+        <div class="modal-status-badge" id="modal-status-badge">
+          <span class="modal-status-dot"></span>
+          <span id="modal-status-text">ANALİZ TAMAMLANDI</span>
+        </div>
+
+        <h3 class="modal-verdict-title" id="modal-verdict-title">Yolcu Memnun Kalır</h3>
+        <p class="modal-verdict-desc" id="modal-verdict-desc">
+          LightGBM modeli yüksek memnuniyet olasılığı tespit etti.
+        </p>
+
+        <!-- Büyük Dairesel Skor Göstergesi -->
+        <div class="modal-score-card">
+          <div class="modal-score-number" id="modal-score-pct">%96,5</div>
+          <div class="modal-score-caption">Memnuniyet Olasılığı</div>
+        </div>
+
+        <!-- Özet Detay Satırları -->
+        <div class="modal-summary-grid">
+          <div class="modal-grid-cell">
+            <span class="cell-label">Yolcu</span>
+            <span class="cell-val" id="modal-val-passenger">Kadın, 35 Yaş</span>
+          </div>
+          <div class="modal-grid-cell">
+            <span class="cell-label">Sınıf</span>
+            <span class="cell-val" id="modal-val-class">Business</span>
+          </div>
+          <div class="modal-grid-cell">
+            <span class="cell-label">Seyahat</span>
+            <span class="cell-val" id="modal-val-travel">İş Seyahati</span>
+          </div>
+          <div class="modal-grid-cell">
+            <span class="cell-label">Hizmet Puanı</span>
+            <span class="cell-val" id="modal-val-service">4.2 / 5.0</span>
+          </div>
+        </div>
+
+        <!-- Butonlar -->
+        <div class="modal-actions-row">
+          <button type="button" class="btn-modal-analytics" id="btn-modal-to-analytics">
+            <span>📊 Analiz Geçmişini Gör</span>
+          </button>
+          <button type="button" class="btn-modal-close" id="btn-modal-close">Tamam</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="{{ url_for('static', filename='js/modal-plane3d.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

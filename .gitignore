@@ -1,0 +1,14 @@
+# Ortam
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Model çıktıları (büyükse repoya koymak istemeyebilirsin)
+models/*.pkl
+
+# OS
+.DS_Store
