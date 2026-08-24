@@ -29,6 +29,12 @@ Detaylı adım adım plan için bkz. `Havayolu_Yolcu_Memnuniyeti_Yol_Haritasi.do
 
 <br/>
 
+<div align="center">
+<img src="docs/screenshot-hero.png" width="90%" alt="FlightPlus ana sayfa görünümü" />
+</div>
+
+<br/>
+
 ## 📋 İçindekiler
 
 - [✨ Öne Çıkan Özellikler](#-öne-çıkan-özellikler)
@@ -92,6 +98,8 @@ Inflight wifi service → Online boarding → Customer Type → Class.**
 ## 🗂️ Klasör Yapısı
 
 ```
+docs/
+  screenshot-hero.png  # README'deki ana sayfa görüntüsü
 data/
   raw/          # train.csv, test.csv (orijinal, dokunulmaz)
   processed/    # işlenmiş veri (opsiyonel ara çıktılar)
