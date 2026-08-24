@@ -15,3 +15,8 @@ models/*.pkl
 
 # Temizlik icin ayrilan (henuz elle silinmemis) dosyalar
 _to_delete/
+
+# AI araci/skill dosyalari (portfolyo repo disi)
+.agents/
+.claude/
+skills-lock.json
