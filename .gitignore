@@ -12,3 +12,6 @@ models/*.pkl
 
 # OS
 .DS_Store
+
+# Temizlik icin ayrilan (henuz elle silinmemis) dosyalar
+_to_delete/
