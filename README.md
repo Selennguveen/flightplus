@@ -93,6 +93,31 @@ Puanı, Toplam/Fark Gecikme, Yaş Grubu, log dönüşümleri).
 SHAP'e göre modelin kararında en etkili 5 özellik: **Type of Travel →
 Inflight wifi service → Online boarding → Customer Type → Class.**
 
+### 🔬 10 Model Karşılaştırması
+
+LightGBM'e karar vermeden önce, aynı özellik mühendisliği + ön işleme
+adımlarının sonuna 10 farklı algoritma takılıp 5 katlı stratified
+cross-validation ile karşılaştırıldı (eğitim setinde, hiperparametre
+ayarından önce):
+
+| Model | Accuracy | F1-Score | ROC-AUC |
+|---|---|---|---|
+| **LightGBM** | **%96,33** | **%95,69** | **%99,47** |
+| XGBoost | %96,22 | %95,58 | %99,47 |
+| Random Forest | %95,99 | %95,30 | %99,33 |
+| Extra Trees | %95,87 | %95,14 | %99,28 |
+| Gradient Boosting | %94,26 | %93,28 | %98,76 |
+| Decision Tree | %94,35 | %93,50 | %94,27 |
+| KNN | %91,71 | %90,13 | %96,35 |
+| AdaBoost | %91,16 | %89,80 | %96,98 |
+| Logistic Regression | %87,55 | %85,33 | %92,82 |
+| Naive Bayes | %85,39 | %82,80 | %91,51 |
+
+LightGBM ve XGBoost birbirine çok yakın çıktı; LightGBM biraz daha
+yüksek F1 ve çok daha kısa eğitim süresiyle öne çıktığı için seçildi,
+ardından hiperparametre araması ve karar eşiği optimizasyonuyla yukarıdaki
+final test sonuçlarına ulaşıldı.
+
 <br/>
 
 ## 🗂️ Klasör Yapısı
